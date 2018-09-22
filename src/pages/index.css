@@ -54,7 +54,7 @@ blockquote, p, div {
 }
 
 code {
-  font-family: Consolas, Liberation Mono, Menlo, Courier, Hiragino Sans GB, Microsoft YaHei, SimHei, monospace;
+  font-family: Courier, Consolas, Liberation Mono, Menlo, Hiragino Sans GB, Microsoft YaHei, SimHei, monospace;
   font-size: 1rem;
   line-height: 1.42rem
 }
