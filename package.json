@@ -3,9 +3,10 @@
   "description": "Gatsby hello world starter",
   "license": "MIT",
   "scripts": {
-    "develop": "gatsby develop",
+    "start": "gatsby develop",
     "build": "gatsby build",
-    "serve": "gatsby serve"
+    "serve": "gatsby serve",
+    "deploy": "gatsby build && gh-pages -d public"
   },
   "dependencies": {
     "gatsby": "^1.9.277",
@@ -14,5 +15,8 @@
     "gatsby-transformer-orga": "^0.5.4",
     "react": "^16.5.1",
     "react-dom": "^16.5.1"
+  },
+  "devDependencies": {
+    "gh-pages": "^2.0.0"
   }
 }

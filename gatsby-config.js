@@ -1,5 +1,4 @@
 module.exports = {
-  pathPrefix: "/gatsby-orga",
   plugins: [
     {
       resolve: `gatsby-source-filesystem`,
