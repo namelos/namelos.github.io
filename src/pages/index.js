@@ -4,7 +4,12 @@ import Link from 'gatsby-link'
 
 export default function BlogIndex({ data }) {
   return <div>
-    <h1>Namelos</h1>
+    <h1>
+      <Link to="/">Namelos</Link>
+    </h1>
+
+    <br />
+
     {data.allOrga.edges.map(({ node }) =>
       <Post {...node} key={node.fields.slug} />)}
   </div>
