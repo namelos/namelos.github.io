@@ -1,0 +1,2 @@
+webpackJsonp([0x81b8806e4260],{218:function(t,a){t.exports={data:{allOrga:{edges:[{node:{fields:{slug:"/syntax/"},meta:{title:"Orga with Gatsby",date:"2018-01-01"}}}]}},pathContext:{}}}});
+//# sourceMappingURL=path---index-d8c938fd8c398d84c875.js.map
