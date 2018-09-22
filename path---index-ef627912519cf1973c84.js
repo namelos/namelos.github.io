@@ -1,0 +1,2 @@
+webpackJsonp([0x81b8806e4260],{220:function(t,e){t.exports={data:{allOrga:{edges:[{node:{fields:{slug:"/common-lisp-1/"},meta:{title:"Practical Common Lisp Reading Notes (1)",date:"2018-09-22"}}},{node:{fields:{slug:"/syntax/"},meta:{title:"Orga with Gatsby",date:"2018-01-01"}}}]}},pathContext:{}}}});
+//# sourceMappingURL=path---index-ef627912519cf1973c84.js.map
