@@ -1,5 +1,9 @@
 {
   "assetsByChunkName": {
+    "path---sicp-exercise-ch-3": [
+      "path---sicp-exercise-ch-3-b221a192623da3e185c4.js",
+      "path---sicp-exercise-ch-3-b221a192623da3e185c4.js.map"
+    ],
     "component---src-pages-index-js": [
       "component---src-pages-index-js-ccfcf6a915efc83aa8cf.js",
       "component---src-pages-index-js-ccfcf6a915efc83aa8cf.js.map"
@@ -9,12 +13,12 @@
       "path---common-lisp-0-691f0dd69c1781674384.js.map"
     ],
     "path---common-lisp-1": [
-      "path---common-lisp-1-6f51a545a3366fb35b6e.js",
-      "path---common-lisp-1-6f51a545a3366fb35b6e.js.map"
+      "path---common-lisp-1-a4551446ed865884c17c.js",
+      "path---common-lisp-1-a4551446ed865884c17c.js.map"
     ],
     "path---index": [
-      "path---index-bd6cdab4f739ad9c819b.js",
-      "path---index-bd6cdab4f739ad9c819b.js.map"
+      "path---index-c4004701b0e5d11c5c5d.js",
+      "path---index-c4004701b0e5d11c5c5d.js.map"
     ],
     "commons": [
       "commons-677a0f8e0293361e4134.js",
@@ -27,10 +31,14 @@
       "component---src-templates-post-js-bd41ec710cf6e1dcb1d1.js.map"
     ],
     "app": [
-      "app-9aca012511852c0bbd07.js",
+      "app-248a3d0734ac0f88e6d9.js",
       "build-js-styles.css",
-      "app-9aca012511852c0bbd07.js.map",
+      "app-248a3d0734ac0f88e6d9.js.map",
       "build-js-styles.css.map"
+    ],
+    "path---sicp-0": [
+      "path---sicp-0-979d7151c7cb84dbb461.js",
+      "path---sicp-0-979d7151c7cb84dbb461.js.map"
     ]
   }
 }
