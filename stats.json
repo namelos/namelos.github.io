@@ -16,9 +16,13 @@
       "path---common-lisp-1-a4551446ed865884c17c.js",
       "path---common-lisp-1-a4551446ed865884c17c.js.map"
     ],
+    "path---sicp-1": [
+      "path---sicp-1-22c766c8bd58c1f5083f.js",
+      "path---sicp-1-22c766c8bd58c1f5083f.js.map"
+    ],
     "path---index": [
-      "path---index-c4004701b0e5d11c5c5d.js",
-      "path---index-c4004701b0e5d11c5c5d.js.map"
+      "path---index-4a7580e492cbf4a93552.js",
+      "path---index-4a7580e492cbf4a93552.js.map"
     ],
     "commons": [
       "commons-677a0f8e0293361e4134.js",
@@ -31,14 +35,14 @@
       "component---src-templates-post-js-bd41ec710cf6e1dcb1d1.js.map"
     ],
     "app": [
-      "app-248a3d0734ac0f88e6d9.js",
+      "app-1327465833fdebf95864.js",
       "build-js-styles.css",
-      "app-248a3d0734ac0f88e6d9.js.map",
+      "app-1327465833fdebf95864.js.map",
       "build-js-styles.css.map"
     ],
     "path---sicp-0": [
-      "path---sicp-0-979d7151c7cb84dbb461.js",
-      "path---sicp-0-979d7151c7cb84dbb461.js.map"
+      "path---sicp-0-6e0a1639b42ab40bdd44.js",
+      "path---sicp-0-6e0a1639b42ab40bdd44.js.map"
     ]
   }
 }
