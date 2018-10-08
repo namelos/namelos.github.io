@@ -1,0 +1,192 @@
+#+TITLE: SICP Reading Notes
+#+DATE: 2018-01-01
+We ordinarily view the world by /objects/. Each object can contain internal state and could be changed over time. In a system composed with many objects, object can influence each other's through interactions. This can make subsystems or objects internally closely coupled which keeping loosely coupled with other systems.
+
+#+BEGIN_QUOTE
+We will investigate two prominent organizational strategies arising from two rather different ``world views'' of the structure of systems. The first organizational strategy concentrates on objects, viewing a large system as a collection of distinct objects whose behaviors may change over time. An alternative organizational strategy concentrates on the streams of information that flow in the system, much as an electrical engineer views a signal-processing system.
+#+END_QUOTE
+
+* Assignment and Local State
+
+Think of this API:
+#+BEGIN_SRC scheme
+(withdraw 25) ; => 75
+(withdraw 25) ; => 50
+(withdraw 60) ; => "insufficient funds"
+(withdraw 35) ; => 35
+#+END_SRC
+
+Expression =(withdraw 25)= was evaluated twice, and yield different values. Until now, all of our procedure could be viewed as mathmatical functions. Calling a procedure with same arguments, always preduced the same results.
+
+We could implment =withdraw= like this:
+#+BEGIN_SRC scheme
+(define (withdraw amount)
+  (if (>= balance amount)
+      (begin (set! balance (- balance amount))
+             balance)
+      "Insufficient funds"))
+#+END_SRC
+
+Decrementing is accomplished by =set!=, whose syntax is:
+#+BEGIN_SRC scheme
+(set! <name> <new-value>)
+#+END_SRC
+
+And =begin= can evaluated a sequnce of expressions and return the last expression's value.
+
+Although our =withdraw= work as expected, the global variable =balance= was exposed and could be freely examined and modified.
+
+We can make =balance= internal to =withdraw=:
+#+BEGIN_SRC scheme
+(define new-withdraw
+  (let ((balance 100))
+    (lambda (amount)
+      (if (>= balance amount)
+          (begin (set! balance (- balance amount))
+                 balance)
+          "Insufficient funds"))))
+#+END_SRC
+
+We use =let= to introduce a local variable =balance=. And with this local environment, we use =lambda= to create a procedure that takes =amount= as argument, and behaves like previous =withdraw=.
+
+After we introduced assignment to our code, the substitution is no longer an adequate model.
+
+Then we can create a constructor:
+#+BEGIN_SRC scheme
+(define (make-withdraw balance)
+  (lambda (amount)
+    (if (>= balance amount)
+        (begin (set! balance (- balance amount))
+               balance)
+        "Insufficient funds")))
+#+END_SRC
+
+Play with it a little bit:
+#+BEGIN_SRC scheme
+(define W1 (make-withdraw 100))
+(define W2 (make-withdraw 100))
+(W1 50) ; => 50
+(W2 70) ; => 30
+(W2 40) ; => "Insufficient funds"
+(W1 40) ; => 10
+#+END_SRC
+
+Interestingly, =W1= and =W2= are completely independent, each with its own local state variable =balance=.
+
+#+BEGIN_SRC scheme
+(define (make-account balance)
+  (define (withdraw amount)
+    (if (>= balance amount)
+        (begin (set! balance (- balance amount))
+               balance)
+        "Insufficient funds"))
+  (define (deposit amount)
+    (set! balance (+ balance amount))
+    balance)
+  (define (dispatch m)
+    (cond ((eq? m 'withdraw) withdraw)
+          ((eq? m 'deposit) deposit)
+          (else (error "Unknown request -- MAKE-ACCOUNT" m))))
+  dispatch)
+
+(define acc (make-account 100))
+((acc 'withdraw) 50) ; => 50
+((acc 'deposit) 60) ; => "Insufficient funds"
+((acc 'withdraw) 60) ; => 30
+#+END_SRC
+
+We return an additional procedure =dispatch= that takes a message as input and return one of the two local precedures. This is precisely the /message-passing/ style of programming.
+
+* The Benefits of Introducing Assignment
+Introducing assignment is both introducing diffculties and benefits. For the benefits part, it's a powerful technique for maintaining modular design.
+
+#+BEGIN_QUOTE
+To be implemented Monte Carlo Simulation section
+#+END_QUOTE
+
+* The Costs of Introducing Assignment
+Consider these two functions:
+#+BEGIN_SRC scheme
+(define (make-simplified-withdraw balance)
+  (lambda (amount)
+    (set! balance (- balance amount))
+    balance))
+
+(define (make-decrementer balance)
+  (lambda (amount)
+    (- balance amount)))
+#+END_SRC
+
+We can use substitution model to explain how =make-decrementer= works:
+#+BEGIN_SRC scheme
+((make-decrementer 25) 20)
+((lambda (amount) (- 25 amount)) 20)
+(- 25 20)
+5
+#+END_SRC
+
+However, if we attempt a similar substitution analysis with =make-simplified-withdraw=:
+#+BEGIN_SRC scheme
+((make-simplified-withdraw 25) 20)
+((lambda (amount) (set! balance (- 25 amount)) 25) 20)
+(set! balance (- 25 20))
+25
+#+END_SRC
+This is incorrect because =set!= first set =balance= to 5 then return 25 as the value of the expression.
+The trouble here is that substitution is based ultimately on the notion that the symbols in our language ar essentially names for values. But as soon as we introduce =set!= and the idea that the value of a variable can change, a variable can no longer simply be a name.
+
+* Sameness and change
+Not only substitution model is violated after introducing variable, many notions become problematical. One of them is two things being *the same*. Say we call =make-decrementer= twice:
+
+#+BEGIN_SRC scheme
+(define D1 (make-decrementer 25))
+(define D2 (make-decrementer 25))
+#+END_SRC
+
+D1 and D2 are conceptual same because they have same computational behavior. In constract if we call =make-simplified-withdraw= twice:
+
+#+BEGIN_SRC scheme
+(define W1 (make-simplified-withdraw 25))
+(define W2 (make-simplified-withdraw 25))
+#+END_SRC
+
+They are not same because they are not /referentially transparent/. In another word, it disables the mental model inlanguage that 'equals can be substitued for equals'.
+
+However, in real world the meaning of 'same' is hardly clear itself. Even Peter and Paul's bank accounts have same deposit, they are different accounts. A bank account is still 'the same' even if we change the balance. Conversely, rational number could be still the same even they have different numerator and denomenator.
+
+* Pitfall of imperative programming
+In constrast to /functional programming/, programming that make extensive use of assignment is known as /imperative programming/. Program written in imperative style are suspectipble to bugs that cannot occur in functional programs. For previous =factorial= example:
+
+#+BEGIN_SRC scheme
+(define (factorial n)
+  (define (iter product counter)
+    (if (> counter n)
+        product
+        (iter (* counter product)
+              (+ counter 1))))
+  (iter 1 1))
+#+END_SRC
+
+If we make it in a imperative manner:
+#+BEGIN_SRC scheme
+(define (factorial n)
+  (let ((product 1)
+        (counter 1))
+    (define (iter)
+      (if (> counter n)
+          product
+          (begin (set! product (* counter product))
+                 (set! counter (+ counter 1))
+                 (iter))))
+    (iter)))
+#+END_SRC
+
+This is correct but if we write it in the opposite order it would have produced an incorrect result:
+#+BEGIN_SRC scheme
+(set! counter (+ counter 1))
+(set! product (* counter product))
+#+END_SRC
+
+This will become even worse if we consider applications in which several processes execute concurrently.
+
+

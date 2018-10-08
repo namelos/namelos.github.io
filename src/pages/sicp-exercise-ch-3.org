@@ -1,0 +1,128 @@
+#+TITLE: SICP Chapter 3 Exercises
+#+DATE: 2018-09-23
+
+* Exercise 3.1
+An accumulator is a procedure that is called repeatedly with a single numeric argument and accumulates its arguments into a sum. Each time it is called, it returns the currently accumulated sum. Write a procedure make-accumulator that generates accumulators, each maintaining an independent sum. The input to make-accumulator should specify the initial value of the sum; for example
+
+#+BEGIN_SRC scheme
+(define A (make-accumulator 5))
+(A 10) ; => 10
+(A 10) ; => 25
+#+END_SRC
+
+Solution:
+#+BEGIN_SRC scheme
+(define (make-accumulator initial-value)
+  (lambda (delta)
+    (begin (set! initial-value
+             (+ initial-value delta))
+           initial-value)))
+#+END_SRC
+
+* Exercise 3.2
+In software-testing applications, it is useful to be able to count the number of times a given procedure is called during the course of a computation. Write a procedure make-monitored that takes as input a procedure, f, that itself takes one input. The result returned by make-monitored is a third procedure, say mf, that keeps track of the number of times it has been called by maintaining an internal counter. If the input to mf is the special symbol how-many-calls?, then mf returns the value of the counter. If the input is the special symbol reset-count, then mf resets the counter to zero. For any other input, mf returns the result of calling f on that input and increments the counter. For instance, we could make a monitored version of the sqrt procedure:
+
+#+BEGIN_SRC scheme
+(define s (make-monitored sqrt))
+(s 100) ; => 10
+(s 'how-many-calls?) ; => 1
+#+END_SRC
+
+Solution:
+#+BEGIN_SRC scheme
+(define (make-monitored f)
+  (let ((call-count 0))
+    (define (how-many-calls?)
+      call-count)
+    (define (reset-count)
+      (set! call-count 0))
+    (define (invoke argument)
+      (set! call-count (+ call-count 1))
+      (f argument))
+    (define (dispatch m)
+      (cond ((eq? m 'how-many-calls?) (how-many-calls?))
+            ((eq? m 'reset-count) (reset-count))
+            (else (invoke m))))
+    dispatch))
+#+END_SRC
+
+* Exercise 3.3
+Modify the make-account procedure so that it creates password-protected accounts. That is, make-account should take a symbol as an additional argument, as in
+
+#+BEGIN_SRC scheme
+(define acc (make-account 100 'secret-password))
+#+END_SRC
+
+The resulting account object should process a request only if it is accompanied by the password with which the account was created, and should otherwise return a complaint:
+
+#+BEGIN_SRC scheme
+((acc 'secret-password 'withdraw) 40) ; => 60
+((acc 'some-other-password 'deposit) 50) ; => "Incorrect password"
+#+END_SRC
+
+Solution:
+#+BEGIN_SRC scheme
+(define (make-account balance password)
+  (define (withdraw amount)
+    (if (>= balance amount)
+        (begin (set! balance (- balance amount))
+               balance)
+        "Insufficient funds"))
+  (define (deposit amount)
+    (set! balance (+ balance amount))
+    balance)
+  (define (dispatch password-input m)
+    (cond ((not (eq? password password-input))
+           (lambda (amount) "Incorrect password"))
+          ((eq? m 'withdraw) withdraw)
+          ((eq? m 'deposit) deposit)
+          (else (error "Unknown request -- MAKE-ACCOUNT" m))))
+  dispatch)
+#+END_SRC
+
+* Exercise 3.4
+Modify the make-account procedure of exercise 3.3 by adding another local state variable so that, if an account is accessed more than seven consecutive times with an incorrect password, it invokes the procedure call-the-cops.
+
+Solution:
+#+BEGIN_SRC scheme
+(define (make-account balance password)
+  (let ((consecutive-failures 0))
+    (define (call-cops)
+      "Dialing!")
+    (define (increment-failures)
+      (set! consecutive-failures (+ consecutive-failures 1)))
+    (define (reset-consecutive-failures)
+      (set! consecutive-failures 0))
+    (define (withdraw amount)
+      (reset-consecutive-failures)
+      (if (>= balance amount)
+          (begin (set! balance (- balance amount))
+                 balance)
+          "Insufficient funds"))
+    (define (deposit amount)
+      (reset-consecutive-failures)
+      (set! balance (+ balance amount))
+      balance)
+    (define (incorrect-password amount)
+      (cond ((>= consecutive-failures 7) (call-cops))
+            (else (increment-failures)
+                  "Incorrect password")))
+    (define (dispatch password-input m)
+      (cond ((not (eq? password password-input)) incorrect-password)
+            ((eq? m 'withdraw) withdraw)
+            ((eq? m 'deposit) deposit)
+            (else (error "Unknown request -- MAKE-ACCOUNT" m))))
+    dispatch))
+#+END_SRC
+
+* Exercise 3.7
+Consider the bank account objects created by make-account, with the password modification described in exercise 3.3. Suppose that our banking system requires the ability to make joint accounts. Define a procedure make-joint that accomplishes this. Make-joint should take three
+arguments. The first is a password-protected account. The second argument must match the password with which the account was defined in order for the make-joint operation to proceed. The third argument is a new password. Make-joint is to create an additional access to the original account using the new password. For example, if peter-acc is a bank account with password open-sesame, then
+
+#+BEGIN_SRC scheme
+(define paul-acc
+  (make-joint peter-acc 'open-sesame 'rosebud))
+#+END_SRC
+
+will allow one to make transactions on peter-acc using the name paul-acc and the password rosebud. You may wish to modify your solution to exercise 3.3 to accommodate this new feature.
+

@@ -1,0 +1,236 @@
+#+TITLE: Practical Common Lisp Reading Notes (1)
+#+DATE: 2018-09-22
+
+* Overview
+These are just random notes and comments during reading the great book about CL -- /Practical Common Lisp/.
+And this is some notes from the first chapter. But the notes is not well writtened, just as a personal reminder.
+
+* Functions
+
+Functional programming langugage is about functions, though CL is not just about functional programming. Thus define a function:
+#+BEGIN_SRC lisp
+(defun hello-world() (format t "hello, world"))
+#+END_SRC
+
+And this is how to invoke it:
+#+BEGIN_SRC lisp
+(hello-world)
+#+END_SRC
+
+* Lists
+At its core, lisp is about list:
+#+BEGIN_SRC lisp
+(list 1 2 3)
+(list :a 1 :b 2 :c 3)
+#+END_SRC
+
+Lists with symbols (keywords start with :) are named /property list/, and /plist/ for short.
+
+Use =getf= to resolve values from plists.
+#+BEGIN_SRC lisp
+(getf (list :a 1 :b 2 :c 3) :a) ; => 1
+(getf (list :a 1 :b 2 :c 3) :c) ; => 3
+#+END_SRC
+
+Let's define a function returns a list
+#+BEGIN_SRC lisp
+(defun make-cd (title artist rating ripped)
+  (list :title title :artist artist :rating rating :ripped ripped))
+
+(make-cd "Roses" "Kathy Mattea" 7 t)
+#+END_SRC
+
+* Variables
+=defvar= macro is used for define a global variable, and conventionally with asterisks around its name.
+And the =push= macro is straighfoward enough.
+#+BEGIN_SRC lisp
+(defvar *db* nil)
+
+(defun add-record (cd)
+  (push cd *db*))
+
+(add-record (make-cd "Roses" "Kathy Mattea" 7 t))
+(add-record (make-cd "Fly" "Dixie Chicks" 8 t))
+(add-record (make-cd "Home" "Dixie Chicks" 9 t))
+#+END_SRC
+
+To inspect the variable is just as simple as to type its name:
+#+BEGIN_SRC lisp
+*db*
+#+END_SRC
+
+Use format to make the result more readable:
+#+BEGIN_SRC lisp
+(defun dump-db ()
+  (dolist (cd *db*)
+    (format t "~{~a:~10t~a~%~}~%" cd)))
+
+(dump-db)
+#+END_SRC
+
+=Format= accept two arguments:
+The first one is the stream it sends to, and t is short for the stream =*standard-output*=;
+The Second argument is both the literal and the formating directives.
+
+Directives starts with =~= (similar to =printf='s =%=). And =~a= is the /asthetic/ directive
+which consumes one argument and output in a human-readable form. For keywords:
+#+BEGIN_SRC lisp
+(format t "~a" :title) ; prints => TITLE
+#+END_SRC
+
+=~t= is for tabulating. =~10t= is tabulating 10 spaces:
+#+BEGIN_SRC lisp
+(format t "~a:~10t~a" :artist "Dixie Chicks")
+#+END_SRC
+
+=~{= and =~}= is for starting and ending loop.
+The =~%= indicates a new line.
+
+=FORMAT= can also loop the =*db*= variable itslef:
+#+BEGIN_SRC lisp
+(defun dump-db ()
+  (format t "~{~{~a:~10t~a~%~}~%~}" *db*))
+#+END_SRC
+
+* Promping and Reading Lines
+
+=FORCE-OUTPUT= is to ensure lisp does not wait for new line.
+=READ-LINE= is to read string and =*query-io*= is a stream contains the input stream.
+#+BEGIN_SRC lisp
+(defun prompt-read (prompt)
+  (format *query-io* "~a: " prompt)
+  (force-output *query-io*)
+  (read-line *query-io*))
+#+END_SRC
+
+Then read with this function:
+#+BEGIN_SRC lisp
+(defun prompt-for-cd ()
+  (make-cd
+   (prompt-read "Title")
+   (prompt-read "Artist")
+   (prompt-read "Rating")
+   (prompt-read "Ripped [y/n]")))
+#+END_SRC
+
+Add parsing and fallback to rating, and make ripped options only accepts valid inputs:
+#+BEGIN_SRC lisp
+(defun prompt-for-cd ()
+  (make-cd
+   (prompt-read "Title")
+   (prompt-read "Artist")
+   (or (parse-integer (prompt-read "Rating") :junk-allowed t) 0)
+   (y-or-n-p "Ripped [y/n]: ")))
+#+END_SRC
+
+Let user add more:
+#+BEGIN_SRC lisp
+(defun add-cds ()
+  (loop (add-record (prompt-for-cd))
+        (if (not (y-or-n-p "Another? [y/n]: ")) (return))))
+#+END_SRC
+
+* Persistence
+To persist variable in file:
+#+BEGIN_SRC lisp
+(defun save-db (filename)
+  (with-open-file (out filename
+                       :direction :output
+                       :if-exists :supersede)
+    (with-standard-io-syntax
+      (print *db* out))))
+
+(save-db "~/my-cds.db")
+#+END_SRC
+
+Then read back:
+#+BEGIN_SRC lisp
+(defun load-db (filename)
+  (with-open-file (in filename)
+    (with-standard-io-syntax
+      (setf *db (read in)))))
+#+END_SRC
+
+* Querying
+First let's see something like filtering:
+#+BEGIN_SRC lisp
+(remove-if-not #'evenp '(1 2 3 4 5 6 7 8 9 10)) ; => (2 4 6 8 10)
+(remove-if-not #'(lambda (x) (= 0 (mod x 2))) '(1 2 3 4 5 6 7 8 9 10)) ; => (2 4 6 8 10)
+#+END_SRC
+The notation ='#= means the following name indicates a function instead a variable. If we omit ='#= it will try to search a variable and fail. That's a core difference between Lisp-1 and Lisp-2. In Scheme or Clojure, functions and variables are in exact same namespace.
+
+Then apply this pattern to our *db*:
+#+BEGIN_SRC lisp
+(defun select-by-artist (artist)
+  (remove-if-not
+   #'(lambda (cd)
+       (equal (getf cd :artist) artist))
+   *db*))
+
+(select-by-artist "Dixie Chicks")
+#+END_SRC
+
+And generalize it a little bit:
+#+BEGIN_SRC lisp
+(defun select (selector-fn)
+  (remove-if-not selector-fn *db*))
+
+(defun artist-selector (artist)
+  #'(lambda (cd) (equal (getf cd :artist) artist)))
+
+(select (artist-selector "Dixie Chicks"))
+#+END_SRC
+
+* Argument List
+As we know, this function is 3 arity:
+#+BEGIN_SRC lisp
+(defun foo (a b c)
+  (list a b c))
+
+(foo 1 2 3) ; => (1 2 3)
+#+END_SRC
+
+This can help you use something similar as plist as arguments:
+#+BEGIN_SRC lisp
+(defun foo (&key a b c)
+  (list a b c))
+
+(foo :a 1 :b 2 :c 3) ; => (1 2 3)
+#+END_SRC
+
+Let define a =where= function with keyword list:
+#+BEGIN_SRC lisp
+(defun where (&key title artist rating (ripped nil ripped-p))
+  #'(lambda (cd)
+      (and
+       (if title (equal (getf cd :title) title) t)
+       (if artist (equal (getf cd :artist) artist) t)
+       (if rating (equal (getf cd :rating) rating) t)
+       (if ripped-p (equal (getf cd :ripped) ripped) t))))
+
+(select (where :artist "Dixie Chicks"))
+(select (where :rating 10 :ripped nil))
+#+END_SRC
+Note the ripped function is written as =(ripped nil ripped-p)=: If ripped is not provided by caller, it would fallback to the second element in list -- =nil=. In the meantime ripped-p would be nil, otherwise if caller provides the value it would be t. This helps you differenciate the argument is provided as nil or just absence.
+
+* Mutations
+
+Updating and deleting records:
+#+BEGIN_SRC lisp
+(defun update (selector-fn &key title artist rating (ripped nil ripped-p))
+  (setf *db*
+        (mapcar
+         #'(lambda (row)
+             (when (funcall selector-fn row)
+               (if title (setf (getf row :title) title))
+               (if artist (setf (getf row :artist) artist))
+               (if rating (setf (getf row :rating) rating))
+               (if ripped-p (setf (getf row :ripped) ripped)))
+             row)
+         *db*)))
+
+(defun delete-rows (selector-fn)
+  (setf *db* (remove-if selector-fn *db*)))
+#+END_SRC
+
+* 

@@ -1,0 +1,10 @@
+#+TITLE: SICP: A Boring Introduction
+#+DATE: 2018-10-05
+
+Put the famous [[https://mitpress.mit.edu/sites/default/files/sicp/index.html][wizard book]] aside, there are other things on my mind. So this is not an introduction at all, in fact.
+
+[[http://www.paulgraham.com/vb.html][Life is Short]]. This is one of my favorite article from Paul. I just finished an assignment, and I'm feeling bad. Doing errand makes me feels bad, makes me feel I'm wasting time on non-important things. To be honest, I don't even understand why there are so many rich people still do errands for fun instead of creating their own awesome stuff.
+
+Usually I would play some video games after those stressful errands. However, I'm not in mood of playing all those. There are too many things on the list, and seems to be overwhelming to do it all. I guess this statement is true for almost everyone. And those list eventually make people worrying. Then possibly doing random stuff and give up. For this very book, I don't remember how many times I pick it up and interrupt by errands. Eventually give up for a while and then pick up again almost from the beginning.
+
+Stop. Long story short, let me stop worrying and finish this book once and for all.

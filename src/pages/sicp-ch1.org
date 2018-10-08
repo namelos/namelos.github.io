@@ -1,0 +1,357 @@
+#+TITLE: SICP Reading Notes Chapter 1
+#+DATE: 2018-10-06
+
+* Why Lisp?
+  The language pocesses unique features that make it an excellent medium for studying important programming constructs and data structures and for relating them to the linguistic feature that support them. The most significant of these features is the fact that Lisp descriptions of process, called /procedures/, can themselves be represented and manipulated as Lisp data. The importance of this is that there are powerful program-design techniques that rely on the ability to blur the traditional distinction between /passive/ data and /active/ process. The ability to represent procedures as data also makes Lisp an excellent language for writing programs that must manipulate other programs as data, such as the interpreters and compilers that support computer languages. Above and beyond these considerations, programming in Lisp is great fun.
+
+** 1.1 The Elements of Programming
+   Every powerful language has three mechanisms for accomplishing this:
+ - Primitive expressions, which represent the simplist entities and the language is concerned with
+ - Means of combination, by which compound elements are built from simpler ones
+ - Means of abstraction, by which compound elements can be named and manipulated as units
+   
+ In programming, we deal with two kinds of elements: /procedures/ and /data/.
+
+** Expressions
+You type and /expression/, and the interpreter responds by displaying the result of its /evaluating/ that expression.
+   
+One kind of primitive expression you might type is number: If you preset Lisp with a number
+#+BEGIN_SRC scheme
+486
+#+END_SRC
+
+Expression may be combined with an expression representing a primitive procedure such as =+= or =*= to form a compound expression that represents the application of the procedure to those numbers. For example:
+#+BEGIN_SRC scheme
+(+ 137 349)
+#+END_SRC
+
+Expression such as these, formed by delimiting a list of expressions within parentheses in order to denote precedure application, are called /combinations/. The left most element in the list is called the /operator/, and the other elements are called /operands/. The value of a combination is obtained by applying the procedure specified by the operator to the /arguments/ that are the values of the operands.
+
+The form that put the operator in the leftmost position is called /prefix notation/.
+It may take multiple arguments, without ambiguity.
+#+BEGIN_SRC scheme
+(+ 21 35 12 7)
+#+END_SRC
+Another advantage is it can be provide a straightforward way to allow combination s to be nested.
+
+** 1.1.2 Naming and the Environment
+In scheme, we name things with =define=
+#+BEGIN_SRC scheme
+(define size 2)
+#+END_SRC
+
+Then we can refer the value 2 by name
+#+BEGIN_SRC scheme
+size ; => 2
+(* 5 size) ; => 10
+#+END_SRC
+
+=Define= is our language's simplest means of abstraction.
+
+** 1.1.3 Evaluating Combinations
+To evaluate a combination, do the following:
+- Evaluate the subexpressions of the combination
+- Apply the procedure that is the value of the leftomst subexpression (the operator) to the arguments that are the values of the other subexpression (the operands)
+
+The first step is in order to accomplish the evaluation process for a combination we must first perform the evaluation on each element of the combination. Thus, the evaluation rule is /recursive/ in nature. That is, it includes, as one of it steps, the neeed to invoke itself.
+
+- the values of numerals are the numbers that they name
+- the values of built-in operators are the machine instruction sequence that carry out the corresponding operations
+- the values of other names are objects associated with those names in the environment
+
+The second rule is a special case of the third one by stipulating that symbols such as =+= and =*= are also included in the global environment, and are associated with the sequence of machine instructions that are their 'values'. The key point to notice is the role of the environment in determining the meaning of the symbol in expressions. It is meaningless to speak of the value of an expression such a =(+ x 1)= without specifying any information about the meaining for the symbol =x= (or even for the symbol =+=).
+
+The given rule given above does not handle definitions. Evaluating (define x 3) does not apply define to two arguments. Such exceptions to the general evaluation rule are called /special forms/.
+
+** 1.1.4 Compound procedures
+We have identified in Lisp some of the elements that they must appear in any powerful language
+- Numbers and arthmetic operations are primitive data and procedures
+- Nesting of combinations provides a menas of combining operations
+- Definitions that associate names with values provide a limited means of abstraction
+
+Now we will learn about /procedure definitions/, a much more powerful abstraction technique by which a compound can be given a name and then referred to as a unit.
+
+We begin by examining how to express the idea of "squaring". We might say, "To square something, multiply it by itself".
+#+BEGIN_SRC scheme
+(define (square x) (* x x))
+#+END_SRC
+
+We can understand this in the following way
+#+BEGIN_SRC scheme
+(define (square x)         (*       x     x))
+;To      square something, multiply it by itself.
+#+END_SRC
+
+The general form of a procedure definition is
+#+BEGIN_QUOTE
+(define (<name> <formal parameters>) <body>)
+#+END_QUOTE
+
+Having defined =square=, we can now use it
+#+BEGIN_SRC scheme
+(square 21)
+(square (+ 2 5))
+(square (square 3))
+(+ (square x) (square y))
+(define (sum-of-squares x y)
+  (+ (square x) (square y)))
+(f 5)
+#+END_SRC
+
+** The Substitution Model for Procedure Application
+For compound procedures, the application process is as follows
+- To apply a compound procedure to arguments, evaluate the body of the procedure with each formal parameter replaced by the corresponding argument.
+To illustrate this process, let's evaluat the combination
+#+BEGIN_SRC scheme
+(f 5)
+(sum-of-squares (+ a 1) (* a 2))
+(sum-of-squares (+ 5 1) (* 5 1))
+(+ (square 6) (square 10))
+(+ (* 6 6) (* 10 10))
+(+ 36 100)
+136
+#+END_SRC
+
+This process we have just described is called /substitution model/ for procedure application. It can be take as a model that determines the "meaning" of procedure application, insofar as the chapter are concerned. However, there are two points that should be stressed:
+- The purpose of the substitution is to help us think about the procedure application, not to provide a description of how the interpreter really works. Typical interpreter does not evaluate procedure application by manipulating the text of a procedure to substitude values for the formal parameters. In practice, the "substitution" is accomplished by using a local environment for the formal parameters. We will discuss this more fully in chapter 3 and 4 when we examine the implementation of an interpreter in detail.
+- Over the course of this book, we will present a sequence of increasingly elaborate models of how interpreters work, culminating with a complete implementation of an interpreter and compiler in chapter 5. The substitution model is only the first of these models -- a way to get started thingking formally about the evaluation process. In general, when modeling phoenomena in science and engineering, we begin with simplified, incomplete models. As we examine things in greater detail, these simple models become inadequate and must be replaced by more refined models. The substitution model is no exception. In paticular, when we address in chapter 3 the use of procedures with "mutable data", we will see that the substitution model breaks down and must be replaced by a more complicated model of procedure application.
+
+*** Application order versus normal order
+As we described, the interpreter first evaluates the operator and operands then applies the resulting procedure to the resulting arguments. This is not the only way to perform evaluation. An alternative evaluation model would not evaluate the operands until their values were needed. Instead it would first substitude operand expressions for parameters until it obtained an expression involving only primitive operators, and would then perform the evaluation. If we use this method, the evaluation of
+#+BEGIN_SRC scheme
+(f 5)
+(sum-of-squares (+ 5 1) (* 5 2))
+(+ (square (+ 5 1)) (square * 5 2))
+(+ (* (+ 5 1) (+ 5 1)) (* (* 5 2) (* 5 2)))
+(+ (* 6 6) (* 10 10))
+(+ 36 100)
+136
+#+END_SRC
+
+This gives the same answer as our previous evaluation model, but the process is different. In particular, the evaluation of =(+ 5 1)= and =(* 5 2)= are each performaed twice here.
+
+This alternative "fully expand and then reduce" evaluation method is known as /normal-order evaluation/, in contrast to the "evaluate the argument and then apply" method that the interpreter actually uses, with called /applicative-order evaluation/. It can be shown that, for procedure application that can be modeled using substitution and that yield legitimate values, normal-order and applicative-order evaluation do not give the same result.
+
+Lisp use application-order evaluation, partly because of the additional efficiency obtained from avoiding multiple evaluations of the expressions and, more significantly, because normal-order evaluation becomes much more complicated to deal with when we leave the realm of procedures that can be modeled by substituion. On the other hand, normal-order evaluation can be extremely valuable tool, and we will investigate some of its implications in chapter 3 and 4.
+
+*** 1.1.6 Conditional Expressions and Predicates
+The expressive power of the class of procedures that we can define at this point is very limited, because we have no way to make tests and to perform different operations depending on result of a test. For instance, we cannot define a procedure that computes the absolute value of a number by testing wether the number is positive, negative, or zero and taking different cases according to the rule
+#+BEGIN_SRC 
+|x| = x if x > 0
+    = 0 if x = 0
+    = -x if x < 0
+#+END_SRC
+
+This construct is called /case analysis/, and there is a special form in Lisp for notating such a case analysis. It is called =cond= (which stands for "conditional"), and it is used as follows
+#+BEGIN_SRC scheme
+(define (abs x)
+  (cond ((< x 0) x)
+        ((= x 0) 0)
+        ((< x 0) (- x))))
+#+END_SRC
+
+The general form of a conditional expression is
+#+BEGIN_QUOTE
+(cond (<p1> <e1>)
+      (<p2> <e2>)
+      ...
+      (<pn> <en>))
+#+END_QUOTE
+
+Here is yet another way to write the absolute value procedure:
+#+BEGIN_SRC scheme
+(define (abs x)
+  (if (< x 0)
+      (- x)
+      x))
+#+END_SRC
+
+This uses the special form =if=, a restricted type of conditional that can be used when there are precisely two cases in the case analysis. The general form of an if expression is
+#+BEGIN_QUOTE
+(if <predicate> <consequent> <alternative>)
+#+END_QUOTE
+
+In addition to primitive predicates such as <, =, and > there are logical composition operations, which enable use to construct compound predicates. The three most frequently used are these:
+- =(and <e1> ... <en>)=
+- =(or <e1> ... <en>)=
+- =(not <e>)=
+
+Notice that =and= and =or= are special forms, not procedures, because the subexpressions are not necessarily all evaluated. =Not= is an ordinary procedure.
+
+** Exercise 1.1
+Below is a sequence of expressions. What is the result printed by the interpreter in response to each expression? Assume that the sequence is to be evaluated in the order which is presented.
+#+BEGIN_SRC scheme
+10 ; => 10
+(+ 5 3 4) ; => 12
+(- 9 1) ; => 8
+(/ 6 2) ; => 3
+(+ (* 2 4) (- 4 6)) ; => 6
+(define a 3) ; bind a to 3
+(define b (+ a 1)) ; bind b to 4
+(+ a b (* a b)) ; => 19
+(= a b) ; => #f
+(if (and (> b a) (< b (* a b)))
+    b
+    a) ; => 4
+(cond ((= a 4) 6)
+      ((= b 4) (+ 6 7 a))
+      (else 25)) ; => 16
+(+ 2 (if (> b a) b a)) ; => 6
+(* (cond ((> a b) a)
+         ((< a b) b)
+         (else -1))
+   (+ a 1)) ; => 16
+#+END_SRC
+
+** Exercise 1.2
+Translate the following expression into prefix form
+#+BEGIN_SRC scheme
+(/ (+ 5
+      4
+      (- 2
+         (- 3
+            (+ 6
+               (/ 1 3)))))
+   (* 3
+      (- 6 2)
+      (- 2 7)))
+#+END_SRC
+
+** Exercise 1.3
+Define a procedure that takes three numbers as arguments and returns the sum of the squares of the two larger numbers.
+#+BEGIN_SRC scheme
+(define (sum-of-squares-two-larger-numbers-out-of-three x y z)
+  (define (square x)
+    (* x x))
+  (define (sum-of-squares x y)
+    (+ (square x)
+       (square y)))
+  (define (larger x y)
+    (if (> x y)
+        x
+        y))
+  (define (two-larger-numbers-out-of-three x y z)
+    (cond ((and (> x y)
+                (> x z)) (list x
+                               (larger y z)))
+          ((and (> y x)
+                (> y z)) (list y
+                               (larger x z)))
+          (else (list z
+                      (larger x y)))))
+  (apply sum-of-squares (two-larger-numbers-out-of-three x y z)))
+#+END_SRC
+
+** Exercise 1.4
+Observe that our model of evaluation for combinations whose operators are compound expressions. Use this observation to describe the behavior of the following procedure.
+
+** Exercise 1.5
+Ben Bitdiddle has invented a test to determine whether the interpreter he is faced with is using applicative-order evaluation or normal-order evaluation. He defines the following two procedures
+#+BEGIN_SRC scheme
+(define (p) (p))
+
+(define (test x y)
+  (if (= x 0)
+      0
+      y))
+#+END_SRC
+
+If applicative-order applied, =(p)= will be evaluated first, then it will recurse infinitely:
+#+BEGIN_SRC scheme
+(test 0 (p))
+(test 0 (p))
+...
+#+END_SRC
+
+If normal-order applied, the evaluation of =(p)= would be delayed until needed. Because special form =if= also use similar evaluation rule as normal-order, the recursive expression =p= would not be evaluated at all. Thus returns the first expression 0.
+#+BEGIN_SRC scheme
+(test 0 (p))
+(if (= 0 0) 0 (p))
+0
+#+END_SRC
+
+** 1.1.7 Example: Square Root by Newton's Method
+Procedures, as introduced above, are much like ordinary mathematical functions. They specify a value that is determined by one or more parameters. But there is an important difference between methematical functions and computer procedures. Procedures must be effective.
+Consider problem of computing square roots. It will not help matters to rephrase this definition in pseudo-Lisp
+#+BEGIN_SRC scheme
+(define (sqrt x)
+  (the y (and (>= y 0)
+              (= (square y) x))))
+#+END_SRC
+The definition does not describe a procedure. Indeed, it tells use almost nothing about how to actually find the square root of a given number.
+
+The contrast between function and procedure is a reflection of the general distinction between describing properties of things and describing how to do things, or, as it is sometimes referred to, the distinction between declarative knowledge and imperative knowledge. In mathematics we are usually concerned with declarative (what is) descriptions, whereas in computer science we are usually concerned with imperative (how to) descriptions.
+
+How does one compute square roots? The most common way is to use Newton's method of successive approximations:
+
+|  Guess | Quotient            | Average                        |
+|--------+---------------------+--------------------------------|
+|      1 | (2/1) = 2           | ((2 + 1)/2) = 1.5              |
+|    1.5 | (2/1.5) = 1.3333    | ((1.3333 + 1.5)/2) = 1.4167    |
+| 1.4167 | (2/1.4167) = 1.4118 | ((1.4167 + 1.4118)/2) = 1.4142 |
+| 1.4142 | ...                 | ...                            |
+
+Continuing this process, we obtain better and better approximations to the square root.
+
+Let's formalize the process in terms of procedures
+#+BEGIN_SRC scheme
+(define (sqrt-iter guess x)
+  (if (good-enough? guess x)
+      guess
+      (sqrt-iter (improve guess x)
+                 x)))
+
+(define (improve guess x)
+  (average guess (/ x guess)))
+
+(define (average x y)
+  (/ (+ x y) 2))
+
+(define (good-enough? guess x)
+  (< (abs (- (square guess) x)) 0.001))
+
+(define (square x)
+  (* x x))
+
+(define (sqrt x)
+  (sqrt-iter 1.0 x))
+
+(sqrt 9)
+#+END_SRC
+
+The =sqrt= program also illustrates that the simple procedural language we have introduced so far is sufficient for writing any purely numerical program that one could write in, say, C or Pascal. This might seems suprising, since we have not included in our language any iteracitve (looping) constructs that direct the computer to do something over and over again. =Sqrt-iter=, on the other hand, demonstrates how iteration can be accomplished using no special construct other then the ordinary ability to call a procedure.
+
+** Exercise 1.6
+Alyssa P. Hacker doesn't see why =if= needs to be provided as a special form. "Why can't I just define it as an ordinary procedure in terms of cond?" she asks. Alyssa's friend Eva Lu Ator claims this can indeed be done, and she defines a new version of =if=:
+#+BEGIN_SRC scheme
+(define (new-if predicate then-clauses else-clauses)
+  (cond (predicate then-clauses)
+        (else else-clauses)))
+
+(new-if (= 2 3) 0 5)
+(new-if (= 1 1) 0 5)
+#+END_SRC
+Delighted, Alyssa uses =new-if= to rewrite the square-root program:
+
+#+BEGIN_SRC scheme
+(define (sqrt-iter guess x)
+  (new-if (good-enough? guess x)
+          guess
+          (sqrt-iter (improve guess x)
+                     x)))
+#+END_SRC
+It would also fall into infinite loop. Because =new-if= is a common procedure and scheme by default use applicative-order to evaluate expressions. As a result, both branches would be executed for =new-if= no matter the result of predicate expression, and in this case leads the =good-enough?= not be able to stop the loop. Thus an infinite loop would occur.
+
+** Exercise 1.7
+The =good-enough?= test used in computing square roots will not be very effective for finding the square roots of very small numbers. Also, in real computers, arithmetic operations are almost always performed with limited percision. This makes our test inadequate for very large numbers. Explain these statements, with example showing how the test fails for small and large numbers. An alternative strategy for implementing =good-enough?= is to watch how =guess= changes from one iteration to the next and stop when the change is a very small fraction of guess. Design a square-root procedure that use this kind of end test. Does this owrk better for small and large numbers?
+
+- For large numbers, it's pretty hard to find proper sqrt with precision within 0.001. Thus it would be very insufficient.
+- For small numbers, the precision may be to great for 0.001.
+For example: =(* 0.01 0.01)= is =0.0001=. However if we =(sqrt 0.0001)= we get =0.0323...=.
+
+** Exercise 1.8
+Newton's method for cube roots is based on the fact that if y is an approximation to the cube root of x, then a better approximation is given by the value (x/y^2 + 2y) / 3. Use this formula to implement a cube-root procedure analogous to the square-root procedure.
+
+
+
+** 1.1.8 Procedure as Black-Box Abstractions
