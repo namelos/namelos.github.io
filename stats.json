@@ -1,8 +1,8 @@
 {
   "assetsByChunkName": {
     "path---sicp-exercise-ch-3": [
-      "path---sicp-exercise-ch-3-b221a192623da3e185c4.js",
-      "path---sicp-exercise-ch-3-b221a192623da3e185c4.js.map"
+      "path---sicp-exercise-ch-3-33d9a86e37afaac549b3.js",
+      "path---sicp-exercise-ch-3-33d9a86e37afaac549b3.js.map"
     ],
     "component---src-pages-index-js": [
       "component---src-pages-index-js-ccfcf6a915efc83aa8cf.js",
@@ -25,8 +25,8 @@
       "path---sicp-1-22c766c8bd58c1f5083f.js.map"
     ],
     "path---index": [
-      "path---index-319dd9d6e9dd91a57401.js",
-      "path---index-319dd9d6e9dd91a57401.js.map"
+      "path---index-2423a12a6d5593a184af.js",
+      "path---index-2423a12a6d5593a184af.js.map"
     ],
     "commons": [
       "commons-677a0f8e0293361e4134.js",
@@ -38,11 +38,19 @@
       "component---src-templates-post-js-bd41ec710cf6e1dcb1d1.js",
       "component---src-templates-post-js-bd41ec710cf6e1dcb1d1.js.map"
     ],
+    "path---lambda-let-binding-and-module": [
+      "path---lambda-let-binding-and-module-dd5275fe7066e9e2071b.js",
+      "path---lambda-let-binding-and-module-dd5275fe7066e9e2071b.js.map"
+    ],
     "app": [
-      "app-6e9bd3d3ed140013ca98.js",
+      "app-22988799a627ce99d42d.js",
       "build-js-styles.css",
-      "app-6e9bd3d3ed140013ca98.js.map",
+      "app-22988799a627ce99d42d.js.map",
       "build-js-styles.css.map"
+    ],
+    "path---sicp-3-2": [
+      "path---sicp-3-2-b964f8af6f96d07dd53e.js",
+      "path---sicp-3-2-b964f8af6f96d07dd53e.js.map"
     ],
     "path---sicp-0": [
       "path---sicp-0-968f3a6ca87563c641da.js",
