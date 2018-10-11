@@ -1,12 +1,16 @@
 {
   "assetsByChunkName": {
     "path---sicp-exercise-ch-3": [
-      "path---sicp-exercise-ch-3-33d9a86e37afaac549b3.js",
-      "path---sicp-exercise-ch-3-33d9a86e37afaac549b3.js.map"
+      "path---sicp-exercise-ch-3-2102c65245a8e79f425c.js",
+      "path---sicp-exercise-ch-3-2102c65245a8e79f425c.js.map"
     ],
     "component---src-pages-index-js": [
       "component---src-pages-index-js-ccfcf6a915efc83aa8cf.js",
       "component---src-pages-index-js-ccfcf6a915efc83aa8cf.js.map"
+    ],
+    "path---sicp-ch-2": [
+      "path---sicp-ch-2-ae44ad2c5dd8adc6277a.js",
+      "path---sicp-ch-2-ae44ad2c5dd8adc6277a.js.map"
     ],
     "path---sicp-ch-1": [
       "path---sicp-ch-1-a2cf77029f68b4a81d2f.js",
@@ -25,14 +29,18 @@
       "path---sicp-1-22c766c8bd58c1f5083f.js.map"
     ],
     "path---index": [
-      "path---index-0f4a863e533c2be5c803.js",
-      "path---index-0f4a863e533c2be5c803.js.map"
+      "path---index-260edb75e82b1a402633.js",
+      "path---index-260edb75e82b1a402633.js.map"
     ],
     "commons": [
       "commons-677a0f8e0293361e4134.js",
       "build-js-styles.css",
       "commons-677a0f8e0293361e4134.js.map",
       "build-js-styles.css.map"
+    ],
+    "path---sicp-3-3": [
+      "path---sicp-3-3-82c95303453e3072e156.js",
+      "path---sicp-3-3-82c95303453e3072e156.js.map"
     ],
     "component---src-templates-post-js": [
       "component---src-templates-post-js-bd41ec710cf6e1dcb1d1.js",
@@ -43,14 +51,14 @@
       "path---lambda-let-binding-and-module-dd5275fe7066e9e2071b.js.map"
     ],
     "app": [
-      "app-a84c58351bd8ebe699b3.js",
+      "app-e3ff43f6ec2bc2e0b9ac.js",
       "build-js-styles.css",
-      "app-a84c58351bd8ebe699b3.js.map",
+      "app-e3ff43f6ec2bc2e0b9ac.js.map",
       "build-js-styles.css.map"
     ],
     "path---sicp-3-2": [
-      "path---sicp-3-2-f559ca65b9e3b241b724.js",
-      "path---sicp-3-2-f559ca65b9e3b241b724.js.map"
+      "path---sicp-3-2-1757296c6bc911dbcc8c.js",
+      "path---sicp-3-2-1757296c6bc911dbcc8c.js.map"
     ],
     "path---sicp-0": [
       "path---sicp-0-968f3a6ca87563c641da.js",
