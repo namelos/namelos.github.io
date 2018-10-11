@@ -8,6 +8,12 @@ body {
   margin: 0 auto;
 }
 
+@media (max-width: 1023px) {
+  body {
+    width: 96%;
+  }
+}
+
 h1, h2, h3 {
   font-weight: 400;
   line-height: 1;
