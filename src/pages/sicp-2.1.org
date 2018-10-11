@@ -1,0 +1,44 @@
+#+TITLE: SICP Chapter2.1
+#+DATE: 2018-10-11
+
+* 2.1.1 Arithmetic Operations for Rational Numbers
+- =(make-rat <n> <d>)= returns the rational number whose numerator is the integer =<n>= and whose denominator is the integer =<d>=.
+- =(numer <x>)= returns the numerator of the rational number <x>.
+- =(demon <x>)= returns the denominator of the rational number <x>.
+
+
+#+DOWNLOADED: https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/ch2-Z-G-1.gif @ 2018-10-11 09:08:00
+[[file:2.1.1 Arithmetic Operations for Rational Numbers/ch2-Z-G-1_2018-10-11_09-08-00.gif]]
+#+DOWNLOADED: https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/ch2-Z-G-2.gif @ 2018-10-11 09:07:50
+[[file:2.1.1 Arithmetic Operations for Rational Numbers/ch2-Z-G-2_2018-10-11_09-07-50.gif]]
+
+#+DOWNLOADED: https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/ch2-Z-G-3.gif @ 2018-10-11 09:08:07
+[[file:2.1.1 Arithmetic Operations for Rational Numbers/ch2-Z-G-3_2018-10-11_09-08-07.gif]]
+#+DOWNLOADED: https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/ch2-Z-G-4.gif @ 2018-10-11 09:08:10
+[[file:2.1.1 Arithmetic Operations for Rational Numbers/ch2-Z-G-4_2018-10-11_09-08-10.gif]]
+
+#+DOWNLOADED: https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/ch2-Z-G-5.gif @ 2018-10-11 09:08:16
+[[file:2.1.1 Arithmetic Operations for Rational Numbers/ch2-Z-G-5_2018-10-11_09-08-16.gif]]
+
+We can express these rules as procedures:
+#+BEGIN_SRC scheme
+(define (add-rat x y)
+  (make-rat (+ (* (numer x) (denom y))
+               (* (numer y) (denom x)))
+            (* (denom x) (denom y))))
+(define (sub-rat x y)
+  (make-rat (- (* (numer x) (denom y))
+               (* (numer y) (denom x)))
+            (* (denom x) (denom y))))
+(define (mul-rat x y)
+  (make-rat (* (numer x) (numer y))
+            (* (denom x) (denom y))))
+(define (div-rat x y)
+  (make-rat (* (numer x) (denom y))
+            (* (denom x) (numer y))))
+(define (equal-rat? x y)
+  (= (* (numer x) (denom y))
+     (* (numer y) (denom x))))
+#+END_SRC
+
+** Pairs

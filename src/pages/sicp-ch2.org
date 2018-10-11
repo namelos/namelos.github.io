@@ -1,0 +1,32 @@
+#+TITLE: SICP Chapter2: Building Abstraction with Data
+#+DATE: 2018-10-09
+
+#+BEGIN_QUOTE
+We now come to the decisive step of mathematical abstraction: we forget about what the symbols stand for. ...[The mathematician] need not be idle; there are many operations which he may carry out with these symbols, without ever having to look at the things they stand for.
+
+Hermann Weyl, The Mathematical Way of Thinking
+#+END_QUOTE
+
+We built abstractions by combining procedures to /compound procedures/ in Chapter 1. Now we need the abstractions for combining data objects to form /compound data/
+
+For complex system, compound data is also important
+- To elevate the conceptual level at which we can design our programs: Stop worrying low level strucutre like numerator and denominator. But instead, think of rational number directly. (class, ADT)
+- To increase the modularity of our designs: If we can manipulate rational numbers in their own right, then we can separate the part of our program that deals with rational numbers per se. The general technique of isolating the parts of a program that deal how data objects are used is a powerful design methodology called /data abstraction/ (module?)
+- To use of compound data leads to a real increase in the expressive power of our programming language. Suppose ewe have this: (interface, typeclass)
+#+BEGIN_SRC scheme
+(define (linear-combination a b x y)
+  (+ (* a x) (* b y)))
+#+END_SRC
+
+We could have this and express the idea that from linear combinations whenever addition and multiplication are defined -- for rational numbers, complex numbers, polynominals, or whatever:
+#+BEGIN_SRC scheme
+(define (linear-combination a b x y)
+  (add (mul a x) (mul b y)))
+#+END_SRC
+
+We will:
+- Discover how to form compound data using no special "data" operations at all, only procedures. This will further blur the distinction between "procedure" and "data".
+  - One Key idea with compound data is the notion of /closure/ -- that the glue we use for combining data objects should allow us to combine
+  - Anothe key idea is that compound data object can serve as /convential interfaces/ for combining program modules in mix-and-match ways.
+- We will then augment representational power of our language by introducing /symbolic expressions/ -- data whose elementary part can be arbitrary symbols rather than only numbers.
+- We then implement /generic operations/. In paticular, we instroduce /data-directed programming/ as a technique that allows individual data representations to be designed in isolation and then combined additively (i.e. without modification).

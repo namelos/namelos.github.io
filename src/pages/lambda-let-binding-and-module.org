@@ -1,0 +1,141 @@
+#+TITLE: Functional Programming, Lambda, Let Binding and Environments
+#+DATE: 2018-10-09
+
+Functional programming language always tend to be simpler on mental model. In most of imperative languages, the design are usually more fragiled compared to functional languages. 
+
+One example could be variable bindings, let bindings and lambda.
+
+* Lambda, Curried Functions and Lazy Evaluation
+Let start with lambda:
+#+BEGIN_SRC scheme
+(lambda (x)
+  (+ x 1))
+#+END_SRC
+
+This basically gives you back an anonymous function which does a increment. You can give it a name with special form =define=:
+#+BEGIN_SRC scheme
+(define (increment x)
+  (+ x 1))
+#+END_SRC
+
+This is just short for:
+#+BEGIN_SRC scheme
+(define increment
+  (lambda (x)
+    (+ x 1)))
+#+END_SRC
+
+Let's see a function with larger arity:
+#+BEGIN_SRC scheme
+(define (add x y)
+  (+ x y))
+#+END_SRC
+
+Similarily, this is actually:
+#+BEGIN_SRC scheme
+(define add
+  (lambda (x y)
+    (+ x y)))
+#+END_SRC
+
+Sadly, scheme function does not do auto currying, or we can have:
+#+BEGIN_SRC scheme
+(define add
+  (lambda (x)
+    (lambda (y)
+      (+ x y))))
+#+END_SRC
+
+We need an extra pair of parentheses to invoke the nested version of =add=, but it simpified the lambda and function only to be 1-arity. This is what Haskell do. And another thing Haskell enabled by default is lazy evaluation, which fully made this language a "functional" programming language, since in haskell:
+#+BEGIN_SRC haskell
+one = 1
+#+END_SRC
+
+is basically in scheme:
+#+BEGIN_SRC scheme
+(define one
+  (lambda (dont-care)
+    1))
+#+END_SRC
+
+This is interesting because it not only consider n-arity functions are special case of 1-arity functions, but also variables or bindings are also a special case of 1-arity functions. Thus variables could be eliminated and replaced by function. But this idiom usually makes more sense for lazy language.
+
+* Binding
+Then Let's consider binding:
+#+BEGIN_SRC scheme
+(let ((x 1) (y 2))
+  (+ x y))
+#+END_SRC
+
+This bind =1= to =x= and bind =2= to =y=, but actually it's still a syntax sugar of lambda:
+#+BEGIN_SRC scheme
+(((lambda (x)
+    (lambda (y)
+      (+ x y)))
+  1)
+ 2)
+#+END_SRC
+
+* Variables
+The variable refering here is more like constants in imperative programming:
+
+#+BEGIN_SRC scheme
+(define x 1)
+(define y 2)
+(lambda (increment) (+ x y))
+#+END_SRC
+As long as we don't mutate =x= and =y=. Wherever you execute =increment= yields same result, even if there are other definition of =x= and =y= there. This is called /lexical closure/. And The fundemental concept under this is called /lexical scope/ which basically means the environment of function can refer is the place it was created. This makes more sense because when people define it they mostly think about the code around the function.
+
+Other kind of design also exist like /dynamic scope/, it means the function environment is dynamically defined by the execution environment, which could be a little bit faster but does not make sense nowadays since it's very confusing.
+
+So it's like an environment which also bind to function context, instead a function is just itself without accessing any thing outside. This is tremendously useful because at least you need to refer other functions:
+#+BEGIN_SRC scheme
+(define (square x) (* x x))
+(define (sum-of-squares x y)
+  (+ (square x)
+     (square y)))
+#+END_SRC
+
+Since we need to refer function anyway, this is a universal way to refer both functions and variables. However, other design also exists like Java cannot have first level value and functions. This is very disturbing, making people harder to refer things. Meanwhile, they still need to implement lexical scope in the language anyway. Other example is Lisp-2 like Common Lisp, the variable and function does not use same namespace, also makeing the mental model more complicated compared to scheme. But like dynamic scoping, those design decisions are also give you benefit of performance while damaging the power and accesibility of the language itself.
+
+* Environments
+So what's an environment? Different langugage has different implementations, but it's more easier to understand environment in terms of lambda. And this is also a functional language design should try to implement.
+
+Just keep thinking this:
+#+BEGIN_SRC scheme
+(define x 1)
+(define y 2)
+(lambda (increment) (+ x y))
+#+END_SRC
+
+As this:
+#+BEGIN_SRC scheme
+(define increment
+  (((lambda (x)
+      (lambda (y)
+        (+ x y)))
+    1)
+   2))
+#+END_SRC
+
+Things like rebind variable like this:
+#+BEGIN_SRC scheme
+(define x 1)
+(define y 2)
+(define x 3)
+(lambda (increment) (+ x y))
+#+END_SRC
+
+Could be think as function argument /shadowing/:
+#+BEGIN_SRC scheme
+(define increment
+  ((((lambda (x)
+       (lambda (y)
+         (lambda (x)
+           (+ x y))))
+     3)
+    2)
+   1))
+#+END_SRC
+
+If a language design follows this idiom, things and details could be more concisely understandable.

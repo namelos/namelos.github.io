@@ -1,0 +1,149 @@
+#+TITLE: SICP Section 3.2
+#+DATE: 2018-10-09
+
+We used the substitution model of evaluation to define what is mean by applying a procedure to arguments:
+
+#+BEGIN_QUOTE
+To apply a compound procedure to arguments, evaluate the body of the procedure with each formal parameter replaced by the corresponding argument.
+#+END_QUOTE
+
+Once we admit assignment into our programming language, such a definition is no longer adequate. In the presence of assignment, a variable can no longer be consideresd to be merely a name for a value. A variable must somehow designate a "place" in which values can be stored. In our new model of evaluation, these places will be maintained in structures called /environments/.
+
+An environment is a sequence of /frames/. Each frame is a table (possibly empty) of /bindings/, which associate variable names with their corresponding values. (A single frame may contain at most one binding for any variable.) Each frame has a pointer to its /enclosing environment/, unless, for the purpose of discussion, the frame is considered to be /global/. The /value of a variable/ with respect to an environment is the value given by the binding of the variable in the first frame in the environment that contains a binding for that variable. If no frame in the sequence specifies a binding for the variable, then the variable is said to be unbound in the environment.
+
+
+#+DOWNLOADED: https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/ch3-Z-G-2.gif @ 2018-10-09 05:11:51
+[[file:ch3-Z-G-2_2018-10-09_05-11-51.gif]]
+
+This shows a simple environment structure consisting of three frames, labeled I, II and III. In the diagram, A, B, C and D are pointers to the environments. C and D point to the same environment. The variables =z= and =x= are bound in frame II, while y and x are bound in frame I. The value of x in environment D is 3. The value of =x= in with respect to environment B is also 3. This is determined as follows: We examine the first frame in the sequence (frame III) and do not find a binding for x, so we proceed to the enclosing environment D and find the binding in frame I. On the other hand, the value of =x= in environment A is 7, because the first frame in the sequence (frame II) contains a binding of =x= to 7. With respect to environment A, the binding of =x= to 7 in frame II is said to /shadow/ the binding of =x= to 3 in frame I.
+
+This environment is crucial to the evaluation process, because it determines the context in which an expression should be evaluated. An expression acquires a meaning only with respect to some environment in which it is evaluated. Even the interpretation of an expression as straightforward as =(+ 1 1)= depends on an understanding that one is poerating in a context in which =+= is the symbol for addition. Thus, in our model of evaluation we will always speak of evaluating an expression with respect to some environment. To describe interactions with the interpreter, we will suppose that there is a global environment, consisting of a single frame (with no enclosing environment) that includes values for the symbol associated with the primitive procedures. For example, the idea that + is the symbol for addition is captured by saing that the symbol is bound in the global environment to the primitive addition procedure.
+
+* 3.2.1 The Rules for Evaluation
+The overall specification of how the interpreter evaluates a combination remains the same:
+
+#+BEGIN_QUOTE
+To evaluate a combination:
+- Evaluate the subexpressions of the combination.
+- Apply the value of the operator subexpression to the values of the operand subexpressions.
+#+END_QUOTE
+
+A procedure is always a pair consisting of some code and a pointer to an environment. Procedures are created in one way only: by evaluating a =lambda= expression. This produces a procedure whose code is obtained from the text of =lambda= expression and whose environment is the environment in which the =lambda= expression was evaluated to produce the procedure. For example, consider the procedure definition
+#+BEGIN_SRC scheme
+(define (square x)
+  (* x x))
+#+END_SRC
+
+evaluated in the global environment. The procedure definition is just syntactic sugar for and underlying implicit =lambda= expression. It would have been equivalent to have used
+#+BEGIN_SRC scheme
+(define square
+  (lambda (x)
+    (* x x)))
+#+END_SRC
+
+which evaluates =(lambda (x) (* x x))= and binds =square= to the resulting value, all in the global environment.
+
+
+#+DOWNLOADED: https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/ch3-Z-G-3.gif @ 2018-10-09 07:43:46
+[[file:3.2.1 The Rules for Evaluation/ch3-Z-G-3_2018-10-09_07-43-46.gif]]
+
+This figure shows the result of evaluating the =define= expression. The procedure object is a pair whose code specifies that the procedure has one formal parameter, namely =x=, and a procedure body =(* x x)=. The environment part of the procedure is a pointer to the global environment, since that is the environment in which the =lambda= expression was evaluated to produce the procedure. A new binding, wihch associates the procedure object with symbol =square=, has been added to the global frame. In general, =define= creates definitions by adding bindings to frames.
+
+Now that we have seen how procedures are created, we can describe how procedures are applied. The environment model specifies: To apply a procedure to arguments, create a new environment containing a frame that binds the parameters to the values of arguments. The enclosing environment of this frame is the environment specified by the procedure. Now, within this new environment, evaluating the procedure body.
+
+
+#+DOWNLOADED: https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/ch3-Z-G-4.gif @ 2018-10-10 04:39:46
+[[file:3.2.1 The Rules for Evaluation/ch3-Z-G-4_2018-10-10_04-39-46.gif]]
+
+This illustrates the environment structure created by evaluating the expression =(square 5) in the global environment, where =square= is the procedure generated in last figure. Applying the procedure results in the creation of a new environment, labeled E1 in the figure, that begins with a frme in which x, the formal parameter for the procedure, is bound to the argument 5. The pointer leading upward from this frame shows that the frame's enclosing environment is the global environment. The global environment is chosen here, because this is the environment that is indicated as part of the square procedure object. Within E1, we evaluate the body of the procedure, =(* x x). Since the value of x in E1 is 5, the result is =(* 5 5)=, or 25.
+
+The environment model of procedure application can be summerized by two rules:
+
+- A procedure object is called to a set of arguments by constructing a frame, binding the formal parameters of the procedure to the arguments of the call, and then evaluating the body of the procedure in the context of the new environment constructed. The new frame has as its enclosing environment the environment part of the procedure object being applied. (note: create new environment when function was called)
+
+- A procedure is created by evaluating a =lambda= expression relative to a given environment. The resulting procedure object is a pair consisting of the text of the =lambda= expression and a pointer to the environment in which the procedure was created. (note: lexical scoped functions)
+
+We also specify that defining a symbol using the =define= creates a binding in the current environment frame and assigns to the symbol the indicated value. Finally, we specify the behavior of =set!=, the operation that forced us to introduce the environment model in the first place. Evaluating the expression =(set! <variable> <value>)= in some environment locates the binding of the environment and changes that binding to indicate the new value. That is, one finds the first frame in the environment that contains a binding for the variable and modifies that frame. If the variable is unbound, then =set!= signals an error.
+
+These evaluation rules, though considerably more complex then the substitution model, are still reasonably straightforward. Moreover, the evaluation model, though abstract, provides a correct description of how the interpreter evaluates expressions.
+
+* 3.2.2 Applying Simple Procedures
+When we introduced the substitution model we showed how the combination =(f 5)= evaluates to =136=, given the following procedure definitions:
+#+BEGIN_SRC scheme
+(define (square x)
+  (* x x))
+
+(define (sum-of-squares x y)
+  (+
+   (square x)
+   (square y)))
+
+(define (f a)
+  (sum-of-squares
+   (+ a 1)
+   (* a 2)))
+#+END_SRC
+
+We can analyze the same exmaple using the environment model.
+#+DOWNLOADED: https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/ch3-Z-G-5.gif @ 2018-10-10 06:10:44
+[[file:3.2.2 Applying Simple Procedures/ch3-Z-G-5_2018-10-10_06-10-44.gif]]
+
+This show the three procedure objects created by evaluatin the definition of =f=, =square=, and =sum-of-square= in the global environment. Each procedure object consists of some code, together with a pointer to global environment.
+
+
+#+DOWNLOADED: https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/ch3-Z-G-6.gif @ 2018-10-10 06:14:10
+[[file:3.2.2 Applying Simple Procedures/ch3-Z-G-6_2018-10-10_06-14-09.gif]]
+We see the environment structure created by evaluating the expression =(f 5)=. The call to =f= creates a new environment E1 beginning with a frame in which =a=, the formal parameter of =f=, is bound to the argument =5=. In E1, we evaluate the body f:
+#+BEGIN_SRC scheme
+(sum-of-squares
+ (+ a 1)
+ (* a 1))
+#+END_SRC
+
+To evaluate this combination, we first evaluate the subexpressions, =sum-of-squares=, has a value that is a procedure object. (Notice how this value is found: We first look in the first frame of E1, which contains no binding for =sum-of-squares=. Then we proceed to the enclosing environment, i.e. the global environment, and find the binding from last figure.) The other two subexpressions are evaluated by applying the primitive operations =+= and =*= to evaluate the two combinations =(+ a 1)= and =(* a 2)= to obtain =6= and =10=, respectively.
+
+Now we apply the procedure object =sum-of-squares= to the arguments 6 and 10. This results in a new environment E2 in which the formal parameter =x= and =y= are bound to the arguments. With E2 we evaluate the combination =(+ (square x) (square y))=. This leads of to evaluate =(square x)=, where =square= is found in the global frame and =x= is =6=. Once again, we set up a new environment, E3, in which =x= is bound to 6, and within this we evaluate the body of =square=, which is =(* x x)=. Also as part of applying =sum-of-squares=, we must evaluate the subexpression =(square y)=, where =y= is 10. This second call to =square= creates another environment, E4, in which x, the formal parameter of =square=, is bound to 10. And within E4 we must evaluate =(* x x)=.
+
+The important point to serve is that each call to =square= creates a new environment containing a binding for =x=. We can see here how the different frames serve to keep seperate the different local variables all named =x=. Notice that each frame created by =square= points to the global environment, since this environment indicated by the =square= procedure object.
+
+After the subexpressions are evaluated, the results are returned. The values generated by the two calls to =squre= are added by =sum-of-squares=, and this result is returned by =f=. Since our focus here is on the environment structures, we will not dwell on how these returned values are passed from call to call; however, this is also an important aspect of the evaluation process, and we will return to it in details in chapter 5.
+
+* 3.2.3 Frames as the Repository of Local State
+
+We can turn to the environment model to see how procedures and assignment can be used to present object with locla state. As an example, consider the "withdrawal processor" created by calling the procedure
+#+BEGIN_SRC scheme
+(define (make-withdraw balance)
+  (lambda (amount)
+    (if (>= balance amount)
+        (begin (set! balance (- balance amount))
+               balance)
+        "Insufficient funds")))
+#+END_SRC
+
+Let us describe the evaluation of
+#+BEGIN_SRC scheme
+(define W1 (make-withdraw 100))
+#+END_SRC
+
+followed by
+#+BEGIN_SRC scheme
+(W1 50)
+50
+#+END_SRC
+
+
+#+DOWNLOADED: https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/ch3-Z-G-7.gif @ 2018-10-10 06:49:58
+[[file:3.2.3 Frames as the Repository of Local State/ch3-Z-G-7_2018-10-10_06-49-57.gif]]
+This figure shows the result of defining the =make-withdraw= procedure in the global environment. This produces a procedure object that contains a pointer to the global environment. So far, this is no different from the example we have already seen, except that the body of the procedure itslef a =lambda= expression.
+
+The interesting part of the computation happens when we apply the procedure "make-withdraw" to an argument:
+#+BEGIN_SRC scheme
+(define W1 (make-withdraw 100))
+#+END_SRC
+
+We begin, as usual, by setting up an environment E1 in which the formal parameter =balance= is bound to argument 100. Within this environment, we evaluate the body of make-withdraw, namely the =lambda= expression. This constucts a new procedure object, whose code is as specified by the =lambda= and whose environment is E1, the environment in the =lambda= was evaluated to produce the procedure. The resultin procedure object is the value returned by the call to =make-withdraw=. This is bound to =W1= in the global environment, since the =define= itself is being evaluated in the global environment.
+
+
+#+DOWNLOADED: https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/ch3-Z-G-8.gif @ 2018-10-10 07:13:10
+[[file:3.2.3 Frames as the Repository of Local State/ch3-Z-G-8_2018-10-10_07-13-10.gif]]
+
