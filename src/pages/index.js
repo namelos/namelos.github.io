@@ -6,7 +6,7 @@ export default function BlogIndex({ data }) {
   return <div>
     <h1>Namelos</h1>
     <br />
-    {data.allOrga.edges.map(({ node }) =>
+    {sortEdges(data.allOrga.edges).map(({ node }) =>
       <Post {...node} key={node.fields.slug} />)}
   </div>
 }
@@ -36,3 +36,8 @@ export const pageQuery = graphql`
     }
   }
 `
+
+function sortEdges(edges) {
+  console.log(edges)
+  return edges.sort((a, b) => a.node.meta.date > b.node.meta.date ? -1 : 1)
+}
