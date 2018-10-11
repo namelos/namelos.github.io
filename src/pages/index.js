@@ -38,6 +38,5 @@ export const pageQuery = graphql`
 `
 
 function sortEdges(edges) {
-  console.log(edges)
   return edges.sort((a, b) => a.node.meta.date > b.node.meta.date ? -1 : 1)
 }
