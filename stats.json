@@ -12,6 +12,10 @@
       "path---sicp-ch-2-b90c8c7069cc04b37d66.js",
       "path---sicp-ch-2-b90c8c7069cc04b37d66.js.map"
     ],
+    "path---kubernetes": [
+      "path---kubernetes-b3679e79b4fcf06578b8.js",
+      "path---kubernetes-b3679e79b4fcf06578b8.js.map"
+    ],
     "path---sicp-ch-1": [
       "path---sicp-ch-1-a2cf77029f68b4a81d2f.js",
       "path---sicp-ch-1-a2cf77029f68b4a81d2f.js.map"
@@ -29,8 +33,8 @@
       "path---sicp-1-22c766c8bd58c1f5083f.js.map"
     ],
     "path---index": [
-      "path---index-6d40e413336482d967cf.js",
-      "path---index-6d40e413336482d967cf.js.map"
+      "path---index-c02863e30eed2b0441c0.js",
+      "path---index-c02863e30eed2b0441c0.js.map"
     ],
     "commons": [
       "commons-677a0f8e0293361e4134.js",
@@ -39,8 +43,8 @@
       "build-js-styles.css.map"
     ],
     "path---sicp-3-3": [
-      "path---sicp-3-3-7c49ac84850d9af0c716.js",
-      "path---sicp-3-3-7c49ac84850d9af0c716.js.map"
+      "path---sicp-3-3-ab0bc692f9962e1189ec.js",
+      "path---sicp-3-3-ab0bc692f9962e1189ec.js.map"
     ],
     "component---src-templates-post-js": [
       "component---src-templates-post-js-bd41ec710cf6e1dcb1d1.js",
@@ -51,9 +55,9 @@
       "path---lambda-let-binding-and-module-dd5275fe7066e9e2071b.js.map"
     ],
     "app": [
-      "app-dc824afc96e310bd881f.js",
+      "app-2d57f7443080481a531f.js",
       "build-js-styles.css",
-      "app-dc824afc96e310bd881f.js.map",
+      "app-2d57f7443080481a531f.js.map",
       "build-js-styles.css.map"
     ],
     "path---sicp-3-2": [
